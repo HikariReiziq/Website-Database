@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Input Nama</title>
+</head>
+<body>
+  <h1>Masukkan Nama Anda</h1>
+  <input type="text" id="nama" placeholder="Nama Anda" />
+  <button onclick="kirimNama()">Kirim</button>
+
+  <h2>Daftar Nama:</h2>
+  <ul id="daftar-nama"></ul>
+
+  <script>
+    // Fungsi kirim data ke backend
+    function kirimNama() {
+      const nama = document.getElementById('nama').value;
+      if (!nama.trim()) {
+        alert("Nama tidak boleh kosong");
+        return;
+      }
+
+      fetch('http://localhost:3000/api/nama', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nama })
+      })
+      .then(res => res.text())
+      .then(() => {
+        alert("Nama berhasil disimpan!");
+        document.getElementById('nama').value = ""; // reset input
+        tampilkanNama(); // refresh daftar nama
+      });
+    }
+
+    // Fungsi ambil dan tampilkan data
+    function tampilkanNama() {
+      fetch('http://localhost:3000/api/nama')
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('daftar-nama');
+          list.innerHTML = '';
+          data.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = item.nama;
+            list.appendChild(li);
+          });
+        });
+    }
+
+    // Jalankan saat halaman dimuat
+    window.onload = tampilkanNama;
+  </script>
+</body>
+</html>
